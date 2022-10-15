@@ -30,6 +30,7 @@ BUILD_PATH=""
 # run migrations by adding a release step to your Procfile:
 # `release: ./target/release/diesel migration run`
 RUST_INSTALL_DIESEL=0
+RUST_DIESEL_VERSION=""
 # These flags are passed to `cargo install diesel`, e.g. '--no-default-features --features postgres'
 DIESEL_FLAGS=""
 # Default build flags to pass to `cargo build`.
@@ -146,7 +147,13 @@ fi
 
 # Install diesel so we can use it for migrations
 if [ $RUST_INSTALL_DIESEL -eq 1 ]; then
-  echo "-----> Installing diesel"
-  cargo install diesel_cli $DIESEL_FLAGS || echo "already installed"
+  if [ -n "$RUST_DIESEL_VERSION" ]; then
+    echo "-----> Installing diesel $RUST_DIESEL_VERSION"
+    cargo install "diesel_cli@$RUST_DIESEL_VERSION" $DIESEL_FLAGS || echo "already installed"
+  else
+    echo "-----> Installing diesel"
+    cargo install diesel_cli $DIESEL_FLAGS || echo "already installed"
+  fi
+
   cp $(which diesel) target/release/
 fi
